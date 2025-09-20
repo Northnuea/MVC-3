@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ project.title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="{{ url_for('project_list') }}" class="btn btn-secondary mb-3">← กลับไปหน้ารวมโครงการ</a>
+        <h1 class="mb-4">{{ project.title }}</h1>
+        <p><strong>เป้าหมายยอดระดมทุน:</strong> {{ "{:,.2f}".format(project.target_amount) }} บาท</p>
+        <p><strong>ยอดที่ระดมได้ปัจจุบัน:</strong> {{ "{:,.2f}".format(project.current_amount) }} บาท</p>
+        <p><strong>วันสิ้นสุดโครงการ:</strong> {{ project.deadline }}</p>
+        
+        <div class="progress mb-4">
+            <div class="progress-bar" role="progressbar" style="--progress-width: {{ project.progress }}%;" aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100">{{ project.progress|round|int }}%</div>
+        </div>
+
+        <h3 class="mt-5">ระดับรางวัลที่สนับสนุนได้</h3>
+        <ul class="list-group mb-4">
+            {% for reward in rewards %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>{{ reward.title }}</h5>
+                    <p>ขั้นต่ำ: <strong>{{ "{:,.2f}".format(reward.min_pledge) }}</strong> บาท</p>
+                    {% if reward.quota is not none %}
+                    <p class="text-muted">จำนวนโควตาคงเหลือ: {{ reward.quota }}</p>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        
+        {% if user_id and not project.is_expired %}
+        <div class="card p-4">
+            <h4>สนับสนุนโครงการนี้</h4>
+            <form action="{{ url_for('pledge', project_id=project.project_id) }}" method="post">
+                <div class="form-group">
+                    <label for="amount">จำนวนเงินที่ต้องการสนับสนุน (บาท):</label>
+                    <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="reward_id">เลือกระดับรางวัล (ไม่จำเป็น):</label>
+                    <select class="form-control" id="reward_id" name="reward_id">
+                        <option value="">ไม่ต้องการรางวัล</option>
+                        {% for reward in rewards %}
+                        <option value="{{ reward.reward_id }}">{{ reward.title }} (ขั้นต่ำ {{ "{:,.2f}".format(reward.min_pledge) }} บาท){% if reward.quota is not none %} - เหลือ {{ reward.quota }} {% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">สนับสนุนเลย!</button>
+            </form>
+        </div>
+        {% elif project.is_expired %}
+        <div class="alert alert-warning" role="alert">
+            ขออภัย โครงการนี้หมดระยะเวลาการระดมทุนแล้ว
+        </div>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            <a href="{{ url_for('login') }}">เข้าสู่ระบบ</a> เพื่อสนับสนุนโครงการนี้
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

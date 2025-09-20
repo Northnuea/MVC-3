@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        เข้าสู่ระบบ
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('login') }}" method="post">
+                            <div class="form-group">
+                                <label for="username">ชื่อผู้ใช้ (ใช้: alice, bob, charlie, ...)</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">เข้าสู่ระบบ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>หน้ารวมโครงการ</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">โครงการทั้งหมด 🚀</h1>
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <form class="form-inline" action="/" method="get">
+                    <input type="text" name="q" class="form-control mr-sm-2" placeholder="ค้นหาโครงการ...">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">ค้นหา</button>
+                </form>
+            </div>
+            <div>
+                <form class="form-inline" action="/" method="get">
+                    <label class="my-1 mr-2" for="category_filter">กรองตามหมวดหมู่:</label>
+                    <select class="custom-select my-1 mr-sm-2" id="category_filter" name="category" onchange="this.form.submit()">
+                        <option value="">ทั้งหมด</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.category_id }}" {% if selected_category == cat.category_id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+            <div>
+                <form class="form-inline" action="/" method="get">
+                    <label class="my-1 mr-2" for="sort_by">เรียงตาม:</label>
+                    <select class="custom-select my-1 mr-sm-2" id="sort_by" name="sort_by" onchange="this.form.submit()">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>ใหม่สุด</option>
+                        <option value="deadline" {% if sort_by == 'deadline' %}selected{% endif %}>ใกล้หมดเวลา</option>
+                        <option value="most_funded" {% if sort_by == 'most_funded' %}selected{% endif %}>ระดมได้มากสุด</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text">หมวดหมู่: {{ project.category_id }}</p>
+                        <p class="card-text">ยอดปัจจุบัน: <strong>{{ "{:,.2f}".format(project.current_amount) }}</strong> บาท</p>
+                        <p class="card-text">เป้าหมาย: {{ "{:,.2f}".format(project.target_amount) }} บาท</p>
+                        <div class="progress mb-2">
+                        <div class="progress-bar" role="progressbar" style="--progress-width: {{ project.progress }}%;" aria-valuenow="{{ project.progress }}" 
+                            aria-valuemin="0" aria-valuemax="100"> {{ project.progress|round|int }}% </div>
+                        </div>
+                        <a href="{{ url_for('project_details', project_id=project.project_id) }}" class="btn btn-primary">ดูรายละเอียด</a>
+                        {% if project.is_expired %}
+                        <span class="badge badge-danger">หมดเวลาแล้ว</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-muted">
+                        วันสิ้นสุด: {{ project.deadline }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
