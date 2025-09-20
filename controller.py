@@ -2,14 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import model as db
 import uuid
 from datetime import datetime
-import webbrowser
-import time
 
 app = Flask(__name__, template_folder='view')
-# ตั้งค่าคีย์ลับสำหรับจัดการ Session ซึ่งจำเป็นสำหรับการล็อกอิน
-app.secret_key = 'super_secret_key' 
+app.secret_key = 'super_secret_key'
 
-# เส้นทางสำหรับหน้าล็อกอิน
+# หน้าล็อกอิน
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -25,7 +22,7 @@ def login():
     # แสดงหน้าล็อกอิน
     return render_template('login.html')
 
-# เส้นทางสำหรับออกจากระบบ
+# ออกจากระบบ
 @app.route('/logout')
 def logout():
     # ลบ user_id ออกจาก session
@@ -33,7 +30,7 @@ def logout():
     # redirect กลับไปยังหน้ารวมโครงการ
     return redirect(url_for('project_list'))
 
-# เส้นทางสำหรับหน้ารวมโครงการ
+# หน้ารวมโครงการ
 @app.route('/')
 def project_list():
     # ดึงข้อมูลโครงการและหมวดหมู่ทั้งหมดจาก Model
@@ -65,7 +62,7 @@ def project_list():
     return render_template('index.html', projects=projects, categories=categories, 
                            selected_category=category_filter, sort_by=sort_by)
 
-# เส้นทางสำหรับหน้ารายละเอียดโครงการ
+# หน้ารายละเอียดโครงการ
 @app.route('/project/<project_id>')
 def project_details(project_id):
     # ดึงข้อมูลโครงการและรางวัลตาม project_id
@@ -82,7 +79,7 @@ def project_details(project_id):
     # แสดงผลหน้า project.html พร้อมส่งข้อมูล
     return render_template('project.html', project=project, rewards=rewards, user_id=session.get('user_id'))
 
-# เส้นทางสำหรับจัดการการสนับสนุนโครงการ
+# จัดการการสนับสนุนโครงการ
 @app.route('/pledge/<project_id>', methods=['POST'])
 def pledge(project_id):
     # ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่
@@ -103,7 +100,7 @@ def pledge(project_id):
     # ถ้าสำเร็จให้ redirect กลับไปยังหน้ารายละเอียดโครงการ
     return redirect(url_for('project_details', project_id=project_id))
 
-# เส้นทางสำหรับหน้าสถิติ
+# หน้าสถิติ
 @app.route('/stats')
 def stats():
     # ดึงข้อมูลการสนับสนุนทั้งหมดจาก Model
@@ -114,14 +111,3 @@ def stats():
     
     # แสดงผลหน้า stats.html พร้อมส่งข้อมูลสถิติ
     return render_template('stats.html', success_count=success_count, rejected_count=rejected_count)
-
-# บล็อกสำหรับรันโปรแกรม
-if __name__ == '__main__':
-    # โหลดข้อมูลเริ่มต้นจาก db.json
-    db.load_data()
-    # หน่วงเวลา 1 วินาทีเพื่อให้เซิร์ฟเวอร์พร้อม
-    time.sleep(1) 
-    # เปิดเบราว์เซอร์ไปยังหน้าแรกโดยอัตโนมัติ
-    webbrowser.open_new('http://127.0.0.1:5000/')
-    # เริ่มเซิร์ฟเวอร์ Flask
-    app.run(debug=True)
